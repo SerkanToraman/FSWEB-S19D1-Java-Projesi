@@ -7,6 +7,7 @@ import com.s23g1mtm.project.mappingdto.MovieActorRequest;
 import com.s23g1mtm.project.mappingdto.MovieActorResponse;
 import com.s23g1mtm.project.mappingdto.MovieResponse;
 import com.s23g1mtm.project.service.MovieService;
+import com.s23g1mtm.project.util.movieActorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,18 +27,13 @@ public class MovieController {
 
     @GetMapping("/")
     public List<MovieResponse> findAll(){
-        List<MovieResponse> movieResponses = new ArrayList<>();
         List<Movie> movies = movieService.findAll();
-        for(Movie movie : movies){
-            movieResponses.add(new MovieResponse(movie.getId(), movie.getName(), movie.getDirectorName(), movie.getRating(), movie.getReleaseDate()));
-        }
-        return movieResponses;
+        return movieActorUtil.convertMovieResponses(movies);
     }
-
     @GetMapping("/{id}")
     public MovieResponse findById(@PathVariable int id){
         Movie existsMovie = movieService.findById(id);
-        return new MovieResponse(existsMovie.getId(),existsMovie.getName(),existsMovie.getDirectorName(),existsMovie.getRating(),existsMovie.getReleaseDate());
+        return movieActorUtil.convertMovieResponse(existsMovie);
     }
     @PostMapping("/")
     public MovieActorResponse save(@RequestBody MovieActorRequest movieActorRequest){
@@ -45,19 +41,15 @@ public class MovieController {
         Actor actor = movieActorRequest.getActor();
         movie.addActor(actor);
         Movie savedMovie = movieService.save(movie);
-        return new MovieActorResponse(savedMovie,actor.getId(), actor.getFirstName(), actor.getLastName(), actor.getBirthDate());
+        return movieActorUtil.convertMovieActorResponse(savedMovie,actor);
     }
     @PostMapping("/addActors/{movieId}")
     public List<ActorResponse> addActor(@RequestBody List<Actor> actors, @PathVariable int movieId){
         Movie existingMovie = movieService.findById(movieId);
         existingMovie.addAllActors(actors);
         Movie savedMovie =movieService.save(existingMovie);
-        List<ActorResponse> actorResponses = new ArrayList<>();
-        for (Actor actor : savedMovie.getActors()) {
-            actorResponses.add(new ActorResponse(actor.getId(), actor.getFirstName(), actor.getLastName(),
-                    actor.getBirthDate()));
-        }
-        return actorResponses;
+        return movieActorUtil.convertActorResponses(savedMovie);
+
     }
     @PutMapping("/{id}")
     public MovieResponse update(@RequestBody Movie movie,@PathVariable int id){
@@ -65,14 +57,13 @@ public class MovieController {
         movie.setId(id);
         movie.setActors(existingMovie.getActors());
         Movie updatedMovie = movieService.save(movie);
-        return new MovieResponse(movie.getId(), movie.getName(), movie.getDirectorName(),
-                movie.getRating(), movie.getReleaseDate());
+        return movieActorUtil.convertMovieResponse(updatedMovie);
     }
     @DeleteMapping("/{id}")
     public MovieResponse delete(@PathVariable int id) {
-        Movie movie = movieService.delete(id);
-        return new MovieResponse(movie.getId(), movie.getName(), movie.getDirectorName(),
-                movie.getRating(), movie.getReleaseDate());
+        Movie deletedMovie = movieService.delete(id);
+        return movieActorUtil.convertMovieResponse(deletedMovie);
+
     }
 
 }
