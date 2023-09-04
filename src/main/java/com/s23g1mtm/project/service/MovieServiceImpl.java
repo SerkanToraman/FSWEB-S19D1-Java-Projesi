@@ -3,6 +3,8 @@ package com.s23g1mtm.project.service;
 
 import com.s23g1mtm.project.dao.MovieRepository;
 import com.s23g1mtm.project.entity.Movie;
+import com.s23g1mtm.project.exceptions.GeneralException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
@@ -28,7 +30,7 @@ public class MovieServiceImpl implements MovieService {
         if(movie.isPresent()){
             return movie.get();
         }
-        return null;
+        throw new GeneralException("Movie with given id does not exist: " + id, HttpStatus.BAD_REQUEST);
     }
 
     @Override

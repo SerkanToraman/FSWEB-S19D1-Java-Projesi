@@ -2,6 +2,7 @@ package com.s23g1mtm.project.service;
 
 import com.s23g1mtm.project.dao.ActorRepository;
 import com.s23g1mtm.project.entity.Actor;
+import com.s23g1mtm.project.exceptions.GeneralException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class ActorServiceImpl implements ActorService {
         if(actor.isPresent()){
             return actor.get();
         }
-       return null;
+        throw new GeneralException("Actor does not exist: " + id, HttpStatus.BAD_REQUEST);
     }
 
     @Override
